@@ -30,7 +30,7 @@ model = GecBERTModel(model_paths=args['model_path'],
 
 #%%
 
-request_string = '   A diretoria feia estúpida e arrogante foram embora. Ele vão embora.'
+request_string = 'Eles foi para casa.'
 repl = predict_for_paragraph(request_string, model, batch_size=32)
 
 
