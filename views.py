@@ -10,10 +10,10 @@ defined.
 from gectorPredict.predict import predict_for_paragraph
 from gectorPredict.gector.gec_model import GecBERTModel
 
-args = {'vocab_path':'gectorPredict/MODEL_DIR/vocabulary', 'model_path':['gectorPredict/MODEL_DIR/best.th'],
+args = {'vocab_path':'gectorPredict/MODEL_DIR/vocabulary/', 'model_path':['gectorPredict/MODEL_DIR/best.th'],
         'max_len':50,'min_len':3,'iteration_count':5,'min_error_probability':0.0,
-        'lowercase_tokens':0,'transformer_model':'bertimbau','special_tokens_fix':1,'additional_confidence':0,
-        'is_ensemble':0,'weights':None,'input_file':'eval_after_train.txt','output_file':'OUTPUT_FILE.txt'}
+        'lowercase_tokens':0,'transformer_model':'bertimbau','special_tokens_fix':1,'additional_confidence':0.6,
+        'is_ensemble':0,'weights':None}
 
 model = GecBERTModel(model_paths=args['model_path'],
                      vocab_path=args['vocab_path'],
@@ -31,7 +31,7 @@ model = GecBERTModel(model_paths=args['model_path'],
 #%%
 
 request_string = 'Eles foi para casa.'
-repl = predict_for_paragraph(request_string, model, batch_size=32)
+repl = predict_for_paragraph(request_string, model)
 
 
 
@@ -58,26 +58,6 @@ for i, (key, value) in enumerate(zip(repl.keys(), repl.values())):
     json_output['matches'].append(match_dict)
 
 json_output
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
