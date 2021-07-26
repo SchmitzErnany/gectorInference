@@ -12,7 +12,7 @@ from gectorPredict.gector.gec_model import GecBERTModel
 
 args = {'vocab_path':'gectorPredict/MODEL_DIR/vocabulary/', 'model_path':['gectorPredict/MODEL_DIR/best.th'],
         'max_len':50,'min_len':3,'iteration_count':5,'min_error_probability':0.7,
-        'lowercase_tokens':0,'transformer_model':'bertimbau','special_tokens_fix':1,'additional_confidence':0.3,
+        'lowercase_tokens':0,'transformer_model':'bertimbaubase','special_tokens_fix':1,'additional_confidence':0.3,
         'is_ensemble':0,'weights':None}
 
 model = GecBERTModel(model_paths=args['model_path'],
@@ -30,7 +30,7 @@ model = GecBERTModel(model_paths=args['model_path'],
 
 #%%
 
-request_string = 'A advogada Vanessa defendiam muito, mas Maria defenderam embora.'
+request_string = 'Os familiares Murray fizeram muito pelo tênis.'
 repl = predict_for_paragraph(request_string, model)
 
 

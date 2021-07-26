@@ -45,8 +45,10 @@ def get_weights_name(transformer_name, lowercase):
         return 'transfo-xl-wt103'
     if transformer_name == 'xlnet':
         return 'xlnet-base-cased'
-    if transformer_name == 'bertimbau':
+    if transformer_name == 'bertimbaubase':
         return 'neuralmind/bert-base-portuguese-cased'
+    if transformer_name == 'bertimbaularge':
+        return 'neuralmind/bert-large-portuguese-cased'
 
 
 class GecBERTModel(object):
@@ -145,11 +147,11 @@ class GecBERTModel(object):
         if self.log:
             print(f"Inference time {t55 - t11}")
         return preds, idx, error_probs
-
-    def get_token_action(self, token, index, prob, sugg_token):
+        
+    def get_token_action(self, token, index, error_prob, prob, sugg_token):
         """Get lost of suggested actions for token."""
         # cases when we don't need to do anything
-        if prob < self.min_error_probability or sugg_token in [UNK, PAD, '$KEEP']:
+        if (prob < self.min_error_probability or error_prob < self.min_error_probability) or sugg_token in [UNK, PAD, '$KEEP']:
             return None
 
         if sugg_token.startswith('$REPLACE_') or sugg_token.startswith('$TRANSFORM_') or sugg_token == '$DELETE':
@@ -262,7 +264,7 @@ class GecBERTModel(object):
                 continue
 
             # skip whole sentence if probability of correctness is not high
-            if error_prob < self.min_error_probability:
+            if max(error_prob) < self.min_error_probability:
                 all_results.append(tokens)
                 continue
 
@@ -278,7 +280,7 @@ class GecBERTModel(object):
 
                 sugg_token = self.vocab.get_token_from_index(idxs[i],
                                                              namespace='labels')
-                action = self.get_token_action(token, i, probabilities[i],
+                action = self.get_token_action(token, i, error_prob[i], probabilities[i],
                                                sugg_token)
                 if not action:
                     continue
