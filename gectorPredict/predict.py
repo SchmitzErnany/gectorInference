@@ -74,6 +74,8 @@ def predict_for_paragraph(input_paragraph, model, batch_size=32):
             
             ev_past_token = ev_tok
 
+    # print('number of corrections:', cnt_corrections)
+
     return repl
 
 

@@ -282,12 +282,20 @@ class GecBERTModel(object):
                                                              namespace='labels')
                 action = self.get_token_action(token, i, error_prob[i], probabilities[i],
                                                sugg_token)
+
                 if not action:
                     continue
 
                 edits.append(action)
-            all_results.append(get_target_sent_by_edits(tokens, edits))
-        return all_results
+
+            possible_repls = get_target_sent_by_edits(tokens, edits)
+
+            # for repl in possible_repls:
+            #     if 
+
+            all_results.append(possible_repls)
+
+        return all_results#first_result, all_else
 
     def handle_batch(self, full_batch):
         """
@@ -301,6 +309,8 @@ class GecBERTModel(object):
         pred_ids = [i for i in range(len(full_batch)) if i not in short_ids]
         total_updates = 0
 
+        pred_ids_repeat = []
+        idxs_repeat = []
         for n_iter in range(self.iterations):
             orig_batch = [final_batch[i] for i in pred_ids]
 
@@ -318,6 +328,17 @@ class GecBERTModel(object):
             final_batch, pred_ids, cnt = \
                 self.update_final_batch(final_batch, pred_ids, pred_batch,
                                         prev_preds_dict)
+
+            # pred_ids_repeat += pred_ids
+            
+            # print('orig_batch:', orig_batch)
+            # print('pred_batch:', pred_batch)
+            # print('final_batch:', final_batch)
+            # print('pred_ids:', pred_ids)
+            # print('pred_ids_repeat:', pred_ids_repeat)
+            # print('idxs:', idxs)
+            # print('cnt:', cnt, '\n')
+
             total_updates += cnt
 
             if not pred_ids:
