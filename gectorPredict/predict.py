@@ -1,4 +1,5 @@
 import argparse, tokenizations
+from nltk.tokenize.util import align_tokens
 
 from gectorPredict.utils.helpers import read_lines
 from gectorPredict.gector.gec_model import GecBERTModel
@@ -46,7 +47,7 @@ def predict_for_paragraph(input_paragraph, model, batch_size=32, tokenizer_metho
         tokenized_sentences.append(tokenized_sentence)
         
         # knowing where the spaces are at
-        sent_spans = tokenizations.get_original_spans(tokenized_sentence, sent)
+        sent_spans = align_tokens(tokenized_sentence, sent)
         sent_diffs = [sent_spans[0][0] - 0]; old_span = sent_spans[0];
         for i, span in enumerate(sent_spans[1:]):
             diff = span[0] - old_span[1]
