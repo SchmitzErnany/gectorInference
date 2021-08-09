@@ -30,7 +30,7 @@ model = GecBERTModel(model_paths=args['model_path'],
 
 #%%
 
-request_string = '"Desde que é pai, fica mais em casa."'
+request_string = 'Ele foram embora.'
 repl = predict_for_paragraph(request_string, model, tokenizer_method='nltk')
 
 

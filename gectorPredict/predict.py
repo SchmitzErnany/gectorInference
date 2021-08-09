@@ -30,6 +30,16 @@ def predict_for_file(input_file, output_file, model, batch_size=32):
     return cnt_corrections, [" ".join(x) for x in predictions]
 
 
+# if False, the match is output, otherwise the match is not output.
+def removeFalsePositives(sent_label, tokens_in, regexp_dic):
+    for key in regexp_dic:
+        label_regex = regexp_dic[key][0]
+        pronoun_regex = regexp_dic[key][1]
+        if bool(label_regex.search(sent_label)) and all(not bool(pronoun_regex.search(tok)) for tok in tokens_in):
+            return False
+    return True
+
+
 def predict_for_paragraph(input_paragraph, model, batch_size=32, tokenizer_method='split'):
     test_data = nltk.tokenize.sent_tokenize(input_paragraph, language='portuguese')
     split_positions = [x for x in align_tokens(test_data, input_paragraph)]
@@ -74,21 +84,17 @@ def predict_for_paragraph(input_paragraph, model, batch_size=32, tokenizer_metho
     # removing the first label which is for the SENT_START token
     labels = [x[1:] for x in labels]
     # defining regex patterns for later
-    regexp1S = re.compile(r'VMI3[SP]_VMI1[S]$')
-    regexp1P = re.compile(r'VMI3[SP]_VMI1[P]$')
-    regexpEU = re.compile(r'^[Ee][Uu]$')
-    regexpEUNOS = re.compile(r'^([Ee][Uu]|[Nn][óÓ][sS])$')
+    re1S = re.compile(r'VM.[23][SP]_VM.1[S]$'); re2S = re.compile(r'VM.[13][SP]_VM.2[S]$');
+    re1P = re.compile(r'VM.[23][SP]_VM.1[P]$'); re2P = re.compile(r'VM.[13][SP]_VM.2[P]$');
+    reEU = re.compile(r'^[Ee][Uu]$'); reTU = re.compile(r'^[Tt][Uu]$');
+    reEUNOS = re.compile(r'^([Ee][Uu]|[Nn][óÓ][sS])$'); reTUVOS = re.compile(r'^([Tt][Uu]|[Vv][óÓ][sS])$');
+    regexp_dic = {'1S':[re1S,reEU], '2S':[re2S,reTU], '1P':[re1P,reEUNOS], '2P':[re2P,reTUVOS]}
     # obtain a dictionary with replacements
     repl = dict()
     for sent_pos, tokens_in, tokens_out, spaces_lengths, sent_labels in zip(split_positions, tokenized_sentences, predictions, diffs, labels):
         past_token_in = ''
         for i, (token_in, token_out, space_length, sent_label) in enumerate(zip(tokens_in, tokens_out, spaces_lengths, sent_labels)):
-            replace = True
-            if bool(regexp1S.search(sent_label)) and all(not bool(regexpEU.search(tok)) for tok in tokens_in):
-                replace = False
-            elif bool(regexp1P.search(sent_label)) and all(not bool(regexpEUNOS.search(tok)) for tok in tokens_in):
-                replace = False
-            
+            replace = removeFalsePositives(sent_label, tokens_in, regexp_dic)
             if i == 0:
                 pos = space_length + sent_pos[0]
             elif i > 0:
