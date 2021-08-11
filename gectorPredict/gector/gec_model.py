@@ -235,7 +235,7 @@ class GecBERTModel(object):
             prev_preds = prev_preds_dict[orig_id]
             if orig != pred and pred not in prev_preds:
                 final_batch[orig_id] = pred
-                final_labels[orig_id] = [(pred_label[j] + orig_label[j]) for j in range(len(orig_label))]
+                final_labels[orig_id] = [(pred_label[j] + orig_label[j]) for j in range(len(pred_label))]
                 new_pred_ids.append(orig_id)
                 prev_preds_dict[orig_id].append(pred)
                 total_updated += 1

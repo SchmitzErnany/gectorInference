@@ -1,11 +1,14 @@
 import argparse, re
-from nltk.tokenize.util import align_tokens
 
 from gectorPredict.utils.helpers import read_lines
 from gectorPredict.gector.gec_model import GecBERTModel
 
 import nltk
+from nltk.tokenize.util import align_tokens
 nltk.download('punkt') # download only at first time
+
+import spacy
+spacy_tokenizer = spacy.load("pt_core_news_sm")
 
 
 def predict_for_file(input_file, output_file, model, batch_size=32):
@@ -30,7 +33,7 @@ def predict_for_file(input_file, output_file, model, batch_size=32):
     return cnt_corrections, [" ".join(x) for x in predictions]
 
 
-# if False, the match is output, otherwise the match is not output.
+# if True, the repl entry is added, otherwise it is not.
 def removeFalsePositives(sent_label, tokens_in, regexp_dic):
     for key in regexp_dic:
         label_regex = regexp_dic[key][0]
@@ -51,13 +54,13 @@ def predict_for_paragraph(input_paragraph, model, batch_size=32, tokenizer_metho
     for sent in test_data:
         if tokenizer_method == 'split':
             tokenized_sentence = sent.split()
-        elif tokenizer_method == 'nltk':
-            tokenized_sentence = nltk.tokenize.word_tokenize(sent, language='portuguese')
-        # go-horse fix
-        tokenized_sentence = ['"' if tok in ['``', "''"] else tok for tok in tokenized_sentence]
+        elif tokenizer_method == 'spacy':
+            tokenized_sentence = [str(tok) for tok in spacy_tokenizer(sent)]
+
         tokenized_sentences.append(tokenized_sentence)
         
-        # knowing where the spaces are at
+        # getting to know where the spaces are at
+        #print('here', tokenized_sentence, sent)
         sent_spans = align_tokens(tokenized_sentence, sent)
         sent_diffs = [sent_spans[0][0] - 0]; old_span = sent_spans[0];
         for i, span in enumerate(sent_spans[1:]):
