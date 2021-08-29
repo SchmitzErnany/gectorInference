@@ -30,7 +30,7 @@ model = GecBERTModel(model_paths=args['model_path'],
 
 #%%
 
-request_string = 'Poderá haver muitas pessoas na praia.'
+request_string = '         Poderá haver muitas pessoas na praia.'
 repl = predict_for_paragraph(request_string, model, tokenizer_method='spacy')
 
 
