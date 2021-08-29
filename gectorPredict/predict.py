@@ -82,6 +82,7 @@ def predict_for_paragraph(input_paragraph, model, batch_size=32, tokenizer_metho
         cnt_corrections += cnt
 
 
+
     print('cnt:', cnt_corrections)
     
     # removing the first label which is for the SENT_START token
@@ -95,6 +96,9 @@ def predict_for_paragraph(input_paragraph, model, batch_size=32, tokenizer_metho
     # obtain a dictionary with replacements
     repl = dict()
     for sent_pos, tokens_in, tokens_out, spaces_lengths, sent_labels in zip(split_positions, tokenized_sentences, predictions, diffs, labels):
+        # this is for the case where the label is equal to '$APPEND...' and the sentences have different lengths. Our sentences would then have to be treated differently.
+        if len(tokens_in) != len(tokens_out):
+            continue
         past_token_in = ''
         for i, (token_in, token_out, space_length, sent_label) in enumerate(zip(tokens_in, tokens_out, spaces_lengths, sent_labels)):
             replace = removeFalsePositives(sent_label, tokens_in, regexp_dic)

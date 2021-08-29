@@ -30,13 +30,13 @@ model = GecBERTModel(model_paths=args['model_path'],
 
 #%%
 
-request_string = '         Poderá haver muitas pessoas na praia.'
+request_string = 'Eles fazem isso muitas vezes. ELas faziam isso.'
 repl = predict_for_paragraph(request_string, model, tokenizer_method='spacy')
 
 
 
 json_output = dict()
-json_output['software'] = {'deep3SPVersion':'0.6'}
+json_output['software'] = {'deep3SPVersion':'0.8'}
 json_output['warnings'] = {'incompleteResults':False}
 json_output['language'] = {'name':'Portuguese (Deep SymFree)'}
 json_output['matches'] = []
