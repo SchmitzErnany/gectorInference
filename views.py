@@ -7,7 +7,7 @@ Additionally, every other information for the JSON output is
 defined.
 """
 
-from gectorPredict.predict import predict_for_paragraph, message
+from gectorPredict.predict import predict_for_paragraph, message, short_message, examples
 from gectorPredict.gector.gec_model import GecBERTModel
 
 args = {'vocab_path':'gectorPredict/MODEL_DIR/vocabulary/', 'model_path':['gectorPredict/MODEL_DIR/best.th'],
@@ -47,9 +47,9 @@ for i, (key, value) in enumerate(zip(repl.keys(), repl.values())):
     
     match_dict = dict()
     match_dict['message'] = message(original_token, replacement)
-    match_dict['incorrectExample'] = 'As pessoas foi para casa.'
-    match_dict['correctExample'] = 'As pessoas foram para casa.'
-    match_dict['shortMessage'] = 'Modifique a forma verbal'
+    match_dict['incorrectExample'] = examples(original_token, replacement)[0]
+    match_dict['correctExample'] = examples(original_token, replacement)[1]
+    match_dict['shortMessage'] = short_message(original_token, replacement)
     match_dict['replacements'] = [{'value':replacement}]
     match_dict['offset'] = offset
     match_dict['length'] = length

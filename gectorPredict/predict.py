@@ -23,13 +23,50 @@ def message(original_token, replacement):
     other_replace_condition = any(original_token == tok for tok in ['e', 'esta', 'da', 'mal', 'mau'])
     crase_condition_1 = any(original_token == tok for tok in ['à', 'às']) and any(replacement == tok for tok in ['a', 'as'])
     crase_condition_2 = any(original_token == tok for tok in ['a', 'as']) and any(replacement == tok for tok in ['à', 'às'])
-    print(crase_condition_1, crase_condition_2, original_token, replacement)
+
     if other_replace_condition:
         return other_msg
     elif crase_condition_1 or crase_condition_2:
         return crase_msg
     
     return verb_msg
+
+
+def short_message(original_token, replacement):
+    verb_short_msg = f'Modifique a forma verbal'
+    other_short_msg = f'Modifique a palavra'
+    crase_short_msg = f'Erro de crase'
+    
+    other_replace_condition = any(original_token == tok for tok in ['e', 'esta', 'da', 'mal', 'mau'])
+    crase_condition_1 = any(original_token == tok for tok in ['à', 'às']) and any(replacement == tok for tok in ['a', 'as'])
+    crase_condition_2 = any(original_token == tok for tok in ['a', 'as']) and any(replacement == tok for tok in ['à', 'às'])
+
+    if other_replace_condition:
+        return other_short_msg
+    elif crase_condition_1 or crase_condition_2:
+        return crase_short_msg
+    
+    return verb_short_msg
+
+
+def examples(original_token, replacement):
+    verb_incorrect_example = f'Minha mãe fizeram dois bolos.'
+    verb_correct_example = f'Minha mãe fez dois bolos.'
+    other_incorrect_example = f'Essa pessoa esta muito irritada.'
+    other_correct_example = f'Essa pessoa está muito irritada.'
+    crase_incorrect_example = f'Eu fui as compras no supermercado.'
+    crase_correct_example = f'Eu fui às compras no supermercado.'
+
+    other_replace_condition = any(original_token == tok for tok in ['e', 'esta', 'da', 'mal', 'mau'])
+    crase_condition_1 = any(original_token == tok for tok in ['à', 'às']) and any(replacement == tok for tok in ['a', 'as'])
+    crase_condition_2 = any(original_token == tok for tok in ['a', 'as']) and any(replacement == tok for tok in ['à', 'às'])
+
+    if other_replace_condition:
+        return other_incorrect_example, other_correct_example
+    elif crase_condition_1 or crase_condition_2:
+        return crase_incorrect_example, crase_correct_example
+    
+    return verb_incorrect_example, verb_correct_example
 
 
 def predict_for_file(input_file, output_file, model, batch_size=32):
