@@ -8,7 +8,28 @@ from nltk.tokenize.util import align_tokens
 nltk.download('punkt') # download only at first time
 
 import spacy
+from spacy.symbols import ORTH
 spacy_tokenizer = spacy.load("pt_core_news_sm")
+# add special rule for the tokenizer
+special_case = [{ORTH: "às"}]
+spacy_tokenizer.tokenizer.add_special_case("às", special_case)
+
+
+def message(original_token, replacement):
+    verb_msg = f'O verbo <marker>{original_token}</marker> não concorda com o resto da frase ou não é frequentemente utilizado neste contexto. Considere a alternativa.'
+    other_msg = f'A palavra <marker>{original_token}</marker> pode ter sido confundida com a palavra "{replacement}".'
+    crase_msg = f'Possível erro de crase. Considere a alternativa.'
+    
+    other_replace_condition = any(original_token == tok for tok in ['e', 'esta', 'da', 'mal', 'mau'])
+    crase_condition_1 = any(original_token == tok for tok in ['à', 'às']) and any(replacement == tok for tok in ['a', 'as'])
+    crase_condition_2 = any(original_token == tok for tok in ['a', 'as']) and any(replacement == tok for tok in ['à', 'às'])
+    print(crase_condition_1, crase_condition_2, original_token, replacement)
+    if other_replace_condition:
+        return other_msg
+    elif crase_condition_1 or crase_condition_2:
+        return crase_msg
+    
+    return verb_msg
 
 
 def predict_for_file(input_file, output_file, model, batch_size=32):
@@ -80,8 +101,6 @@ def predict_for_paragraph(input_paragraph, model, batch_size=32, tokenizer_metho
         preds, labels, cnt = model.handle_batch(batch)
         predictions.extend(preds)
         cnt_corrections += cnt
-
-
 
     print('cnt:', cnt_corrections)
     
