@@ -48,8 +48,8 @@ model = GecBERTModel(
 
 #%%
 
-request_string = "Eles fazem isso depois, daquilo."
-repl = predict_for_paragraph(request_string, model, tokenizer_method="split")
+request_string = "Ele foi ao, mercado."
+repl = predict_for_paragraph(request_string, model, tokenizer_method="split+spacy")
 
 
 json_output = dict()
@@ -77,6 +77,7 @@ for i, (key, value) in enumerate(zip(repl.keys(), repl.values())):
         "id": "DEEP_VERB_3SP",
         "subId": 0,
         "sourceFile": "not well defined",
+        "tokenizer": value[3],
         "description": "Deep learning rules for the 3rd person Singular-Plural",
         "issueType": "grammar",
         "category": {"id": "SymFree_DEEP_1", "name": "Deep learning rules (SymFree 1)"},
@@ -88,4 +89,6 @@ for i, (key, value) in enumerate(zip(repl.keys(), repl.values())):
 json_output
 
 
+# %%
+original_token
 # %%

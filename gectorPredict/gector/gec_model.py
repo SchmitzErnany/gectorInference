@@ -186,8 +186,10 @@ class GecBERTModel(object):
             sugg_token_clear = sugg_token[:]
         elif sugg_token == "$ADDCOMMA":
             sugg_token_clear = token[:] + ","
-        elif sugg_token == "$REMOVECOMMA":
+        elif sugg_token == "$REMOVECOMMA" and token[-1] == ',':
             sugg_token_clear = token[:-1]
+        elif sugg_token == "$REMOVECOMMA" and token[-1] != ',':
+            return None
         else:
             sugg_token_clear = sugg_token[sugg_token.index("_") + 1 :]
 
