@@ -28,7 +28,7 @@ def get_verb_form_dicts(decode_list=False):
                 # words_upper = word1.capitalize() + '_' + word2.capitalize()
                 # encode[words_upper] = tags
                 if decode_list:
-                    decode[decode_key] = [word2]
+                    decode[decode_key] = word2
                     # decode[decode_key_upper] = [word2.capitalize()]
                 else:
                     decode[decode_key] = word2
@@ -39,7 +39,7 @@ def get_verb_form_dicts(decode_list=False):
                 # words_upper = word1.capitalize() + '_' + word2.capitalize()
                 # encode[words_upper] = tags
                 if decode_list and word2 not in decode[decode_key]:
-                    decode[decode_key].append(word2)
+                    decode[decode_key] += "___" + word2
                     # decode[decode_key_upper].append(word2.capitalize())
 
 
@@ -47,6 +47,7 @@ def get_verb_form_dicts(decode_list=False):
 
 
 ENCODE_VERB_DICT, DECODE_VERB_DICT = get_verb_form_dicts(decode_list=multiple_replacements)
+ENCODE_VERB_DICT_MULTI, DECODE_VERB_DICT_MULTI = get_verb_form_dicts(decode_list=True)
 
 
 def get_target_sent_by_edits(source_tokens, edits):

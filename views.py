@@ -48,7 +48,7 @@ model = GecBERTModel(
 
 #%%
 
-request_string = "Voce e muito feio."
+request_string = "Hoje farei isso."
 repl = predict_for_paragraph(request_string, model, tokenizer_method="split+spacy")
 
 
@@ -58,7 +58,7 @@ json_output["warnings"] = {"incompleteResults": False}
 json_output["language"] = {"name": "Portuguese (Deep SymFree)"}
 json_output["matches"] = []
 for key, value in zip(repl.keys(), repl.values()):
-    original_token = key[0]  # request_string[value[0] : value[0] + value[1]]
+    original_token = key[0]
     replacement = value["replacement"]
     offset = value["word_position"]
     length = value["word_length"]
@@ -79,9 +79,9 @@ for key, value in zip(repl.keys(), repl.values()):
         "subId": 0,
         "sourceFile": "not well defined",
         "tokenizer": value["tokenizer"],
-        "description": "Deep learning rules for the 3rd person Singular-Plural",
+        "description": "Deep learning rules for verb, replace, comma, etc.",
         "issueType": "grammar",
-        "category": {"id": "SymFree_DEEP_1", "name": "Deep learning rules (SymFree 1)"},
+        "category": {"id": "SymFree_DEEP", "name": "Deep learning rules (SymFree)"},
     }
     match_dict["ignoreForIncompleteSentence"] = False
     match_dict["contextForSureMatch"] = -1
@@ -91,5 +91,10 @@ json_output
 
 
 # %%
-original_token
+from gectorPredict.utils.helpers import DECODE_VERB_DICT, DECODE_VERB_DICT_MULTI
+
+# %%
+DECODE_VERB_DICT["farei_VMI1S_VMI3P"]
+# %%
+DECODE_VERB_DICT_MULTI["farei_VMI1S_VMI3P"]
 # %%
