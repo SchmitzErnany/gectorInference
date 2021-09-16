@@ -32,8 +32,8 @@ def message(original_token, replacement):
     crase_condition_2 = any(original_token == tok for tok in ["a", "as"]) and any(
         replacement == tok for tok in ["à", "às"]
     )
-    comma_condition_1 = original_token[-1] == ',' and replacement[-1] != ','
-    comma_condition_2 = original_token[-1] != ',' and replacement[-1] == ','
+    comma_condition_1 = original_token[-1] == "," and replacement[-1] != ","
+    comma_condition_2 = original_token[-1] != "," and replacement[-1] == ","
 
     if other_replace_condition:
         return other_msg
@@ -60,9 +60,8 @@ def short_message(original_token, replacement):
     crase_condition_2 = any(original_token == tok for tok in ["a", "as"]) and any(
         replacement == tok for tok in ["à", "às"]
     )
-    comma_condition_1 = original_token[-1] == ',' and replacement[-1] != ','
-    comma_condition_2 = original_token[-1] != ',' and replacement[-1] == ','
-
+    comma_condition_1 = original_token[-1] == "," and replacement[-1] != ","
+    comma_condition_2 = original_token[-1] != "," and replacement[-1] == ","
 
     if other_replace_condition:
         return other_short_msg
@@ -93,8 +92,8 @@ def examples(original_token, replacement):
     crase_condition_2 = any(original_token == tok for tok in ["a", "as"]) and any(
         replacement == tok for tok in ["à", "às"]
     )
-    comma_condition_1 = original_token[-1] == ',' and replacement[-1] != ','
-    comma_condition_2 = original_token[-1] != ',' and replacement[-1] == ','
+    comma_condition_1 = original_token[-1] == "," and replacement[-1] != ","
+    comma_condition_2 = original_token[-1] != "," and replacement[-1] == ","
 
     if other_replace_condition:
         return other_incorrect_example, other_correct_example
@@ -197,7 +196,7 @@ def predict_for_paragraph(
             predictions.extend(preds)
             cnt_corrections += cnt
 
-        print("number of iterations:", cnt_corrections, ' | tokenizer:', method)
+        print("number of iterations:", cnt_corrections, " | tokenizer:", method)
 
         # removing the first label which is for the SENT_START token
         labels = [x[1:] for x in labels]
@@ -235,7 +234,13 @@ def predict_for_paragraph(
                 if token_in != token_out:
                     length = len(token_in)
                     if replace:
-                        repl[(token_in, pos)] = (pos, length, token_out, method)
+                        repl[(token_in, pos)] = {
+                            "word_position": pos,
+                            "word_length": length,
+                            "replacement": token_out,
+                            "tokenizer": method,
+                            "transformation_label": sent_label,
+                        }
 
                 past_token_in = token_in
 

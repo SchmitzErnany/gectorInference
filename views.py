@@ -21,11 +21,11 @@ args = {
     "max_len": 50,
     "min_len": 2,
     "iteration_count": 5,
-    "min_error_probability": 0.0007,
+    "min_error_probability": 0.7,
     "lowercase_tokens": 0,
     "transformer_model": "bertimbaubase",
     "special_tokens_fix": 1,
-    "additional_confidence": 0.0003,
+    "additional_confidence": 0.3,
     "is_ensemble": 0,
     "weights": None,
 }
@@ -48,20 +48,21 @@ model = GecBERTModel(
 
 #%%
 
-request_string = "Ele foi ao, mercado."
+request_string = "Voce e muito feio."
 repl = predict_for_paragraph(request_string, model, tokenizer_method="split+spacy")
 
 
 json_output = dict()
-json_output["software"] = {"deep3SPVersion": "0.8"}
+json_output["software"] = {"deep3SPVersion": "1.0"}
 json_output["warnings"] = {"incompleteResults": False}
 json_output["language"] = {"name": "Portuguese (Deep SymFree)"}
 json_output["matches"] = []
-for i, (key, value) in enumerate(zip(repl.keys(), repl.values())):
-    original_token = request_string[value[0] : value[0] + value[1]]
-    replacement = value[2]
-    offset = value[0]
-    length = value[1]
+for key, value in zip(repl.keys(), repl.values()):
+    original_token = key[0]  # request_string[value[0] : value[0] + value[1]]
+    replacement = value["replacement"]
+    offset = value["word_position"]
+    length = value["word_length"]
+    append_id = value["transformation_label"]
     match_dict = dict()
     match_dict["message"] = message(original_token, replacement)
     match_dict["incorrectExample"] = examples(original_token, replacement)[0]
@@ -74,10 +75,10 @@ for i, (key, value) in enumerate(zip(repl.keys(), repl.values())):
     match_dict["sentence"] = request_string
     match_dict["type"] = {"typeName": "Hint"}
     match_dict["rule"] = {
-        "id": "DEEP_VERB_3SP",
+        "id": "DEEP_VERB__" + append_id,
         "subId": 0,
         "sourceFile": "not well defined",
-        "tokenizer": value[3],
+        "tokenizer": value["tokenizer"],
         "description": "Deep learning rules for the 3rd person Singular-Plural",
         "issueType": "grammar",
         "category": {"id": "SymFree_DEEP_1", "name": "Deep learning rules (SymFree 1)"},
