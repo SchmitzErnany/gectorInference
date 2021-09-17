@@ -20,8 +20,10 @@ spacy_tokenizer.tokenizer.add_special_case("às", special_case)
 def message(original_token, replacement):
     verb_msg = f"O verbo <marker>{original_token}</marker> não concorda com o resto da frase ou não é frequentemente utilizado neste contexto. Considere a alternativa."
     
-    if type(replacement) == list:
+    if len(replacement) > 1:
         return verb_msg
+    else:
+        replacement = replacement[0]
 
     other_msg = f'A palavra <marker>{original_token}</marker> pode ter sido confundida com a palavra "{replacement}".'
     crase_msg = f"Possível erro de crase. Considere a alternativa."
@@ -52,9 +54,12 @@ def message(original_token, replacement):
 def short_message(original_token, replacement):
     verb_short_msg = f"Modifique a forma verbal"
 
-    if type(replacement) == list:
+    if len(replacement) > 1:
         return verb_short_msg
+    else:
+        replacement = replacement[0]
 
+    verb_short_msg = f"Modifique a forma verbal"
     other_short_msg = f"Modifique a palavra"
     crase_short_msg = f"Erro de crase"
     comma_short_msg = f"Erro de vírgula"
@@ -85,8 +90,10 @@ def examples(original_token, replacement):
     verb_incorrect_example = f"Minha mãe fizeram dois bolos."
     verb_correct_example = f"Minha mãe fez dois bolos."
 
-    if type(replacement) == list:
+    if len(replacement) > 1:
         return verb_incorrect_example, verb_correct_example
+    else:
+        replacement = replacement[0]
 
     other_incorrect_example = f"Essa pessoa esta muito irritada."
     other_correct_example = f"Essa pessoa está muito irritada."
