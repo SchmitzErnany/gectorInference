@@ -39,7 +39,7 @@ def get_verb_form_dicts(decode_list=False):
                 # words_upper = word1.capitalize() + '_' + word2.capitalize()
                 # encode[words_upper] = tags
                 if decode_list and word2 not in decode[decode_key]:
-                    decode[decode_key] += "___" + word2
+                    decode[decode_key] += "__8__" + word2
                     # decode[decode_key_upper].append(word2.capitalize())
 
 

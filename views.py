@@ -48,7 +48,7 @@ model = GecBERTModel(
 
 #%%
 
-request_string = "Hoje farei isso."
+request_string = "Eles farei aqui."
 repl = predict_for_paragraph(request_string, model, tokenizer_method="split+spacy")
 
 
@@ -59,16 +59,18 @@ json_output["language"] = {"name": "Portuguese (Deep SymFree)"}
 json_output["matches"] = []
 for key, value in zip(repl.keys(), repl.values()):
     original_token = key[0]
-    replacement = value["replacement"]
+    replacements = value["replacements"]
     offset = value["word_position"]
     length = value["word_length"]
     append_id = value["transformation_label"]
     match_dict = dict()
-    match_dict["message"] = message(original_token, replacement)
-    match_dict["incorrectExample"] = examples(original_token, replacement)[0]
-    match_dict["correctExample"] = examples(original_token, replacement)[1]
-    match_dict["shortMessage"] = short_message(original_token, replacement)
-    match_dict["replacements"] = [{"value": replacement}]
+    match_dict["message"] = message(original_token, replacements)
+    match_dict["incorrectExample"] = examples(original_token, replacements)[0]
+    match_dict["correctExample"] = examples(original_token, replacements)[1]
+    match_dict["shortMessage"] = short_message(original_token, replacements)
+    match_dict["replacements"] = []
+    for replacement in replacements:
+        match_dict["replacements"].append({"value": replacement})
     match_dict["offset"] = offset
     match_dict["length"] = length
     match_dict["context"] = {"text": request_string, "offset": offset, "length": length}
@@ -94,7 +96,14 @@ json_output
 from gectorPredict.utils.helpers import DECODE_VERB_DICT, DECODE_VERB_DICT_MULTI
 
 # %%
-DECODE_VERB_DICT["farei_VMI1S_VMI3P"]
+print(DECODE_VERB_DICT.get("farei_VMI1S_VMI3P"))
+print(DECODE_VERB_DICT_MULTI.get("comerei_VMI1S_VMI3P"))
+#%%
+token_out = "ddad__8__dasss"
+sent_label = "ddad__9__dasss"
+if "__8__" in token_out and "__9__" not in sent_label:
+    token_out = token_out.split("__8__")
+token_out
 # %%
-DECODE_VERB_DICT_MULTI["farei_VMI1S_VMI3P"]
+"fdsfsdaéão".split("__8__")
 # %%

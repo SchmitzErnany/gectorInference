@@ -166,7 +166,7 @@ class GecBERTModel(object):
             prob < self.min_error_probability or error_prob < self.min_error_probability
         ) or sugg_token in [UNK, PAD, "$KEEP"]:
             return None
-        
+
         if (
             sugg_token.startswith("$REPLACE_")
             or sugg_token.startswith("$TRANSFORM_")
@@ -186,9 +186,9 @@ class GecBERTModel(object):
             sugg_token_clear = sugg_token[:]
         elif sugg_token == "$ADDCOMMA":
             sugg_token_clear = token[:] + ","
-        elif sugg_token == "$REMOVECOMMA" and token[-1] == ',':
+        elif sugg_token == "$REMOVECOMMA" and token[-1] == ",":
             sugg_token_clear = token[:-1]
-        elif sugg_token == "$REMOVECOMMA" and token[-1] != ',':
+        elif sugg_token == "$REMOVECOMMA" and token[-1] != ",":
             return None
         else:
             sugg_token_clear = sugg_token[sugg_token.index("_") + 1 :]
@@ -275,9 +275,13 @@ class GecBERTModel(object):
             pred_label = pred_labels[i]
             prev_preds = prev_preds_dict[orig_id]
             if orig != pred and pred not in prev_preds:
+                #print(orig_id, orig, pred, prev_preds, prev_preds_dict)
                 final_batch[orig_id] = pred
                 final_labels[orig_id] = [
-                    (pred_label[j] + orig_label[j]) for j in range(len(pred_label))
+                    (pred_label[j] + "__9__" + orig_label[j])
+                    if (pred_label[j] != "" and orig_label[j] != "")
+                    else (pred_label[j] + "" + orig_label[j])
+                    for j in range(len(pred_label))
                 ]
                 new_pred_ids.append(orig_id)
                 prev_preds_dict[orig_id].append(pred)

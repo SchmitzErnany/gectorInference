@@ -1,6 +1,6 @@
 import argparse, re
 
-from gectorPredict.utils.helpers import read_lines
+from gectorPredict.utils.helpers import read_lines, DECODE_VERB_DICT_MULTI
 from gectorPredict.gector.gec_model import GecBERTModel
 
 import nltk
@@ -19,6 +19,10 @@ spacy_tokenizer.tokenizer.add_special_case("às", special_case)
 
 def message(original_token, replacement):
     verb_msg = f"O verbo <marker>{original_token}</marker> não concorda com o resto da frase ou não é frequentemente utilizado neste contexto. Considere a alternativa."
+    
+    if type(replacement) == list:
+        return verb_msg
+
     other_msg = f'A palavra <marker>{original_token}</marker> pode ter sido confundida com a palavra "{replacement}".'
     crase_msg = f"Possível erro de crase. Considere a alternativa."
     comma_msg = f"Possível erro de vírgula. Considere a alternativa."
@@ -47,6 +51,10 @@ def message(original_token, replacement):
 
 def short_message(original_token, replacement):
     verb_short_msg = f"Modifique a forma verbal"
+
+    if type(replacement) == list:
+        return verb_short_msg
+
     other_short_msg = f"Modifique a palavra"
     crase_short_msg = f"Erro de crase"
     comma_short_msg = f"Erro de vírgula"
@@ -76,6 +84,10 @@ def short_message(original_token, replacement):
 def examples(original_token, replacement):
     verb_incorrect_example = f"Minha mãe fizeram dois bolos."
     verb_correct_example = f"Minha mãe fez dois bolos."
+
+    if type(replacement) == list:
+        return verb_incorrect_example, verb_correct_example
+
     other_incorrect_example = f"Essa pessoa esta muito irritada."
     other_correct_example = f"Essa pessoa está muito irritada."
     crase_incorrect_example = f"Eu fui as compras no supermercado."
@@ -195,7 +207,7 @@ def predict_for_paragraph(
             preds, labels, cnt = model.handle_batch(batch)
             predictions.extend(preds)
             cnt_corrections += cnt
-
+        print(labels)
         print("number of iterations:", cnt_corrections, " | tokenizer:", method)
 
         # removing the first label which is for the SENT_START token
@@ -234,10 +246,19 @@ def predict_for_paragraph(
                 if token_in != token_out:
                     length = len(token_in)
                     if replace:
+                        if "__9__" not in sent_label and "TRANSFORM_VERB_" in sent_label:
+                            tag1 = sent_label.split("_")[-2]
+                            tag2 = sent_label.split("_")[-1]
+                            possibly_joined_token_out = DECODE_VERB_DICT_MULTI.get(f"{token_in}_{tag1}_{tag2}")
+                            if possibly_joined_token_out != None:
+                                possibly_split_token_out = possibly_joined_token_out.split("__8__")
+                                token_out = possibly_split_token_out
+                        if type(token_out) == str:
+                            token_out = [token_out]
                         repl[(token_in, pos)] = {
                             "word_position": pos,
                             "word_length": length,
-                            "replacement": token_out,
+                            "replacements": token_out,
                             "tokenizer": method,
                             "transformation_label": sent_label,
                         }
