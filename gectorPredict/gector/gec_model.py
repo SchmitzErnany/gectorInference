@@ -21,6 +21,13 @@ from gectorPredict.utils.helpers import PAD, UNK, get_target_sent_by_edits, STAR
 # logging.getLogger("werkzeug").setLevel(logging.ERROR)
 # logger = logging.getLogger(__file__)
 
+# remove these files every time the module gec_model.py is
+# imported in order not to clutter the log files.
+if os.path.exists("token_results_all.log"):
+    os.remove("token_results_all.log")
+if os.path.exists("token_results_only_wrongs.log"):
+    os.remove("token_results_only_wrongs.log")
+
 # for logging of all token results
 logger_all = logging.getLogger(__name__ + "_all")
 logger_all.setLevel(logging.INFO)

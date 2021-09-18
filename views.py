@@ -48,7 +48,7 @@ model = GecBERTModel(
 
 #%%
 
-request_string = "Eles farei aqui."
+request_string = "Ele venderei aqui."
 repl = predict_for_paragraph(request_string, model, tokenizer_method="split+spacy")
 
 
