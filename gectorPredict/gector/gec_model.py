@@ -358,16 +358,16 @@ class GecBERTModel(object):
             if max(idxs) == 0:
                 all_results.append(tokens)
                 all_transforms.append([""] * len(idxs))
-                logger_all.info(f'No errors identified in the sentence: {tokens}')
-                logger_only_wrongs.info(f'No errors identified in the sentence: {tokens}')
+                logger_all.info(f'no errors identified in the sentence: {tokens}')
+                logger_only_wrongs.info(f'no errors identified in the sentence: {tokens}')
                 continue
 
             # skip whole sentence if probability of correctness is not high
             if max(error_prob) < self.min_error_probability['all']:
                 all_results.append(tokens)
                 all_transforms.append([""] * len(idxs))
-                logger_all.info(f'Errors lie below the min_error_probability threshold in the sentence: {tokens}')
-                logger_only_wrongs.info(f'Errors lie below the min_error_probability threshold in the sentence: {tokens}')
+                logger_all.info(f'errors lie below the min_error_probability threshold in the sentence: {tokens}')
+                logger_only_wrongs.info(f'errors lie below the min_error_probability threshold in the sentence: {tokens}')
                 continue
 
             for i in range(length + 1):
@@ -451,6 +451,8 @@ class GecBERTModel(object):
         total_updates = 0
 
         for n_iter in range(self.iterations):
+            logger_all.info(f"==> ITERATION: {n_iter}")
+            logger_only_wrongs.info(f"==> ITERATION: {n_iter}")
             orig_batch = [final_batch[i] for i in pred_ids]
             orig_labels = [final_labels[i] for i in pred_ids]
 

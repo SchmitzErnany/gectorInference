@@ -21,7 +21,7 @@ args = {
     "max_len": 50,
     "min_len": 2,
     "iteration_count": 5,
-    "min_error_probability": {"all": 0.7, "comma": 0.9},
+    "min_error_probability": {"all": 0.7, "comma": 0.8},
     "lowercase_tokens": 0,
     "transformer_model": "bertimbaubase",
     "special_tokens_fix": 1,
@@ -48,7 +48,7 @@ model = GecBERTModel(
 
 #%%
 
-request_string = "A pessoa feia inteligente e interesseira foi embora."
+request_string = "Ficar arrastando cabelo pra frente ficam feio."
 repl = predict_for_paragraph(request_string, model, tokenizer_method="split+spacy")
 
 
