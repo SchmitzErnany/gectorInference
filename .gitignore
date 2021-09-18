@@ -150,3 +150,5 @@ files/neural_files/train_smallest.txt
 files/neural_files/test_smallest.txt
 files/neural_files/train_30.txt
 files/neural_files/test_30.txt
+token_results_all.log
+token_results_only_wrongs.log

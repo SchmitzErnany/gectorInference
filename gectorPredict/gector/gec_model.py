@@ -18,8 +18,42 @@ from gectorPredict.gector.seq2labels_model import Seq2Labels
 from gectorPredict.gector.wordpiece_indexer import PretrainedBertIndexer
 from gectorPredict.utils.helpers import PAD, UNK, get_target_sent_by_edits, START_TOKEN
 
-logging.getLogger("werkzeug").setLevel(logging.ERROR)
-logger = logging.getLogger(__file__)
+# logging.getLogger("werkzeug").setLevel(logging.ERROR)
+# logger = logging.getLogger(__file__)
+
+# for logging of all token results
+logger_all = logging.getLogger(__name__ + "_all")
+logger_all.setLevel(logging.INFO)
+file_handler = logging.FileHandler("token_results_all.log")
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+file_handler.setFormatter(formatter)
+logger_all.addHandler(file_handler)
+
+# for logging of the token results that are not classified with the label "$KEEP"
+logger_only_wrongs = logging.getLogger(__name__ + "_only_wrongs")
+logger_only_wrongs.setLevel(logging.INFO)
+file_handler = logging.FileHandler("token_results_only_wrongs.log")
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+file_handler.setFormatter(formatter)
+logger_only_wrongs.addHandler(file_handler)
+
+
+def token_logger(
+    which_logger,
+    token_index,
+    token,
+    is_token_wrong,
+    label_modifier,
+    label_modifier_confidence,
+):
+    log = {
+        "token_index": token_index,
+        "original_token": token,
+        "is_token_wrong?": is_token_wrong,
+        "label_modifier": label_modifier,
+        "label_modifier_confidence": label_modifier_confidence,
+    }
+    which_logger.info(log)
 
 
 def get_weights_name(transformer_name, lowercase):
@@ -275,7 +309,7 @@ class GecBERTModel(object):
             pred_label = pred_labels[i]
             prev_preds = prev_preds_dict[orig_id]
             if orig != pred and pred not in prev_preds:
-                #print(orig_id, orig, pred, prev_preds, prev_preds_dict)
+                # print(orig_id, orig, pred, prev_preds, prev_preds_dict)
                 final_batch[orig_id] = pred
                 final_labels[orig_id] = [
                     (pred_label[j] + "__9__" + orig_label[j])
@@ -306,7 +340,7 @@ class GecBERTModel(object):
             length = min(len(tokens), max_len)
             edits = []
 
-            # skip whole sentences if there no errors
+            # skip whole sentences if there are no errors
             if max(idxs) == 0:
                 all_results.append(tokens)
                 all_transforms.append([""] * len(idxs))
@@ -326,11 +360,39 @@ class GecBERTModel(object):
                     token = tokens[i - 1]
                 # skip if there is no error
                 if idxs[i] == noop_index:
+                    # log the results
+                    token_logger(
+                        logger_all,
+                        i,
+                        token,
+                        error_prob[i],
+                        "$KEEP",
+                        probabilities[i],
+                    )
                     continue
 
                 sugg_token = self.vocab.get_token_from_index(
                     idxs[i], namespace="labels"
                 )
+
+                # log the results
+                token_logger(
+                    logger_all,
+                    i,
+                    token,
+                    error_prob[i],
+                    sugg_token,
+                    probabilities[i],
+                )
+                token_logger(
+                    logger_only_wrongs,
+                    i,
+                    token,
+                    error_prob[i],
+                    sugg_token,
+                    probabilities[i],
+                )
+
                 action = self.get_token_action(
                     token, i, error_prob[i], probabilities[i], sugg_token
                 )

@@ -1,7 +1,7 @@
 import argparse, re
 
 from gectorPredict.utils.helpers import read_lines, DECODE_VERB_DICT_MULTI
-from gectorPredict.gector.gec_model import GecBERTModel
+from gectorPredict.gector.gec_model import GecBERTModel, logger_all, logger_only_wrongs
 
 import nltk
 from nltk.tokenize.util import align_tokens
@@ -12,18 +12,18 @@ import spacy
 from spacy.symbols import ORTH
 
 spacy_tokenizer = spacy.load("pt_core_news_sm")
-# add special rule for the tokenizer
+# adding special rule for the tokenizer: keep the word "às" joined and not separate it.
 special_case = [{ORTH: "às"}]
 spacy_tokenizer.tokenizer.add_special_case("às", special_case)
 
 
-def message(original_token, replacement):
+def message(original_token, replacements):
     verb_msg = f"O verbo <marker>{original_token}</marker> não concorda com o resto da frase ou não é frequentemente utilizado neste contexto. Considere a alternativa."
     
-    if len(replacement) > 1:
+    if len(replacements) > 1:
         return verb_msg
     else:
-        replacement = replacement[0]
+        replacement = replacements[0]
 
     other_msg = f'A palavra <marker>{original_token}</marker> pode ter sido confundida com a palavra "{replacement}".'
     crase_msg = f"Possível erro de crase. Considere a alternativa."
@@ -51,13 +51,13 @@ def message(original_token, replacement):
     return verb_msg
 
 
-def short_message(original_token, replacement):
+def short_message(original_token, replacements):
     verb_short_msg = f"Modifique a forma verbal"
 
-    if len(replacement) > 1:
+    if len(replacements) > 1:
         return verb_short_msg
     else:
-        replacement = replacement[0]
+        replacement = replacements[0]
 
     verb_short_msg = f"Modifique a forma verbal"
     other_short_msg = f"Modifique a palavra"
@@ -86,14 +86,14 @@ def short_message(original_token, replacement):
     return verb_short_msg
 
 
-def examples(original_token, replacement):
+def examples(original_token, replacements):
     verb_incorrect_example = f"Minha mãe fizeram dois bolos."
     verb_correct_example = f"Minha mãe fez dois bolos."
 
-    if len(replacement) > 1:
+    if len(replacements) > 1:
         return verb_incorrect_example, verb_correct_example
     else:
-        replacement = replacement[0]
+        replacement = replacements[0]
 
     other_incorrect_example = f"Essa pessoa esta muito irritada."
     other_correct_example = f"Essa pessoa está muito irritada."
@@ -178,6 +178,8 @@ def predict_for_paragraph(
 
     repl = {}
     for method, sentences in data_dic.items():
+        logger_all.info(method)
+        logger_only_wrongs.info(method)
         cnt_corrections = 0
         tokenized_sentences = []
         predictions = []
