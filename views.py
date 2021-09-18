@@ -48,7 +48,7 @@ model = GecBERTModel(
 
 #%%
 
-request_string = "Os policiais esta lá. Eles farei aqui."
+request_string = "Eles farei aqui."
 repl = predict_for_paragraph(request_string, model, tokenizer_method="split+spacy")
 
 
@@ -106,20 +106,4 @@ if "__8__" in token_out and "__9__" not in sent_label:
 token_out
 # %%
 "fdsfsdaéão".split("__8__")
-# %%
-import logging
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-# Create formatters and handlers
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-file_handler = logging.FileHandler('token_results.log')
-file_handler.setFormatter(formatter)
-
-# add handler to logger
-logger.addHandler(file_handler)
-# logging in practice
-logger.info('This is an info')
-
 # %%
