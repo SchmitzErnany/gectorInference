@@ -177,9 +177,11 @@ def predict_for_paragraph(
         data_dic["split"] = test_data[:]
 
     repl = {}
+    logger_all.warning('new paragraph')
+    logger_only_wrongs.warning('new paragraph')
     for method, sentences in data_dic.items():
-        logger_all.info(method)
-        logger_only_wrongs.info(method)
+        logger_all.info(f'TOKENIZER: {method}')
+        logger_only_wrongs.info(f'TOKENIZER: {method}')
         cnt_corrections = 0
         tokenized_sentences = []
         predictions = []
