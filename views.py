@@ -19,7 +19,7 @@ args = {
     "max_len": 50,
     "min_len": 2,
     "iteration_count": 5,
-    "min_error_probability": {"all": 0.7, "comma": 0.8},
+    "min_error_probability": {"all": 0.8, "comma": 0.8, "addcrase": 0.6},
     "lowercase_tokens": 0,
     "transformer_model": "bertimbaubase",
     "special_tokens_fix": 1,
@@ -46,14 +46,14 @@ model = GecBERTModel(
 
 #%%
 
-request_string = "Eles trago, isso."
+request_string = 'Fique atento as expectativas que vierem.'
 repl = predict_for_paragraph(
     request_string,
     model,
     tokenizer_method="split+spacy",
 )
 json_output = replacements_to_json(
-    version="1.0",
+    version="1.1",
     request_string=request_string,
     replacements_dictionary=repl,
 )

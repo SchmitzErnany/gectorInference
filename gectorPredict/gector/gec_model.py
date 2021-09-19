@@ -108,7 +108,7 @@ class GecBERTModel(object):
         model_name="roberta",
         special_tokens_fix=1,
         is_ensemble=True,
-        min_error_probability={'all':0.0, 'comma':0.0},
+        min_error_probability={"all": 0.0, "comma": 0.0, "addcrase": 0.0},
         confidence=0,
         resolve_cycles=False,
     ):
@@ -207,11 +207,24 @@ class GecBERTModel(object):
         # cases when we don't need to do anything:
         # a. in the case that a comma is to be added or removed.
         if any(sugg_token == label for label in ["$ADDCOMMA", "$REMOVECOMMA"]):
-            if (prob < self.min_error_probability['comma'] or error_prob < self.min_error_probability['comma']):
+            if (
+                prob < self.min_error_probability["comma"]
+                or error_prob < self.min_error_probability["comma"]
+            ):
+                return None
+        elif any(
+            sugg_token == label
+            for label in ["$REPLACE_à", "$REPLACE_às", "$REPLACE_À", "$REPLACE_Às"]
+        ):
+            if (
+                prob < self.min_error_probability["addcrase"]
+                or error_prob < self.min_error_probability["addcrase"]
+            ):
                 return None
         # b. in all other cases.
         elif (
-            prob < self.min_error_probability['all'] or error_prob < self.min_error_probability['all']
+            prob < self.min_error_probability["all"]
+            or error_prob < self.min_error_probability["all"]
         ) or sugg_token in [UNK, PAD, "$KEEP"]:
             return None
 
@@ -358,16 +371,23 @@ class GecBERTModel(object):
             if max(idxs) == 0:
                 all_results.append(tokens)
                 all_transforms.append([""] * len(idxs))
-                logger_all.info(f'no errors identified in the sentence: {tokens}')
-                logger_only_wrongs.info(f'no errors identified in the sentence: {tokens}')
+                logger_all.info(f"no errors identified in the sentence: {tokens}")
+                logger_only_wrongs.info(
+                    f"no errors identified in the sentence: {tokens}"
+                )
                 continue
 
             # skip whole sentence if probability of correctness is not high
-            if max(error_prob) < self.min_error_probability['all']:
+            lowest_min_value = min(self.min_error_probability.values())
+            if max(error_prob) < lowest_min_value:
                 all_results.append(tokens)
                 all_transforms.append([""] * len(idxs))
-                logger_all.info(f'errors lie below the min_error_probability threshold in the sentence: {tokens}')
-                logger_only_wrongs.info(f'errors lie below the min_error_probability threshold in the sentence: {tokens}')
+                logger_all.info(
+                    f"errors lie below the min_error_probability threshold in the sentence: {tokens}"
+                )
+                logger_only_wrongs.info(
+                    f"errors lie below the min_error_probability threshold in the sentence: {tokens}"
+                )
                 continue
 
             for i in range(length + 1):
