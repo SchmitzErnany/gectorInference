@@ -9,9 +9,7 @@ defined.
 
 from gectorPredict.predict import (
     predict_for_paragraph,
-    message,
-    short_message,
-    examples,
+    replacements_to_json,
 )
 from gectorPredict.gector.gec_model import GecBERTModel
 
@@ -48,62 +46,17 @@ model = GecBERTModel(
 
 #%%
 
-request_string = "Ficar arrastando cabelo pra frente ficam feio."
-repl = predict_for_paragraph(request_string, model, tokenizer_method="split+spacy")
-
-
-json_output = dict()
-json_output["software"] = {"deep3SPVersion": "1.0"}
-json_output["warnings"] = {"incompleteResults": False}
-json_output["language"] = {"name": "Portuguese (Deep SymFree)"}
-json_output["matches"] = []
-for key, value in zip(repl.keys(), repl.values()):
-    original_token = key[0]
-    replacements = value["replacements"]
-    offset = value["word_position"]
-    length = value["word_length"]
-    append_id = value["transformation_label"]
-    match_dict = dict()
-    match_dict["message"] = message(original_token, replacements)
-    match_dict["incorrectExample"] = examples(original_token, replacements)[0]
-    match_dict["correctExample"] = examples(original_token, replacements)[1]
-    match_dict["shortMessage"] = short_message(original_token, replacements)
-    match_dict["replacements"] = []
-    for replacement in replacements:
-        match_dict["replacements"].append({"value": replacement})
-    match_dict["offset"] = offset
-    match_dict["length"] = length
-    match_dict["context"] = {"text": request_string, "offset": offset, "length": length}
-    match_dict["sentence"] = request_string
-    match_dict["type"] = {"typeName": "Hint"}
-    match_dict["rule"] = {
-        "id": "DEEP_VERB__" + append_id,
-        "subId": 0,
-        "sourceFile": "not well defined",
-        "tokenizer": value["tokenizer"],
-        "description": "Deep learning rules for verb, replace, comma, etc.",
-        "issueType": "grammar",
-        "category": {"id": "SymFree_DEEP", "name": "Deep learning rules (SymFree)"},
-    }
-    match_dict["ignoreForIncompleteSentence"] = False
-    match_dict["contextForSureMatch"] = -1
-    json_output["matches"].append(match_dict)
-
+request_string = "Eles trago, isso."
+repl = predict_for_paragraph(
+    request_string,
+    model,
+    tokenizer_method="split+spacy",
+)
+json_output = replacements_to_json(
+    version="1.0",
+    request_string=request_string,
+    replacements_dictionary=repl,
+)
 json_output
 
-
-# %%
-from gectorPredict.utils.helpers import DECODE_VERB_DICT, DECODE_VERB_DICT_MULTI
-
-# %%
-print(DECODE_VERB_DICT.get("farei_VMI1S_VMI3P"))
-print(DECODE_VERB_DICT_MULTI.get("comerei_VMI1S_VMI3P"))
-#%%
-token_out = "ddad__8__dasss"
-sent_label = "ddad__9__dasss"
-if "__8__" in token_out and "__9__" not in sent_label:
-    token_out = token_out.split("__8__")
-token_out
-# %%
-"fdsfsdaéão".split("__8__")
 # %%

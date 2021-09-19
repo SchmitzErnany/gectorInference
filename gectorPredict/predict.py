@@ -59,7 +59,6 @@ def short_message(original_token, replacements):
     else:
         replacement = replacements[0]
 
-    verb_short_msg = f"Modifique a forma verbal"
     other_short_msg = f"Modifique a palavra"
     crase_short_msg = f"Erro de crase"
     comma_short_msg = f"Erro de vírgula"
@@ -218,7 +217,7 @@ def predict_for_paragraph(
             preds, labels, cnt = model.handle_batch(batch)
             predictions.extend(preds)
             cnt_corrections += cnt
-        print(labels)
+        #print(labels)
         print("number of iterations:", cnt_corrections, " | tokenizer:", method)
 
         # removing the first label which is for the SENT_START token
@@ -278,6 +277,49 @@ def predict_for_paragraph(
 
         # print('number of corrections:', cnt_corrections)
     return repl
+
+
+
+def replacements_to_json(version, request_string, replacements_dictionary):
+
+    json_output = dict()
+    json_output["software"] = {"deep3SPVersion": version}
+    json_output["warnings"] = {"incompleteResults": False}
+    json_output["language"] = {"name": "Portuguese (Deep SymFree)"}
+    json_output["matches"] = []
+    for key, value in zip(replacements_dictionary.keys(), replacements_dictionary.values()):
+        original_token = key[0]
+        replacements = value["replacements"]
+        offset = value["word_position"]
+        length = value["word_length"]
+        append_id = value["transformation_label"]
+        match_dict = dict()
+        match_dict["message"] = message(original_token, replacements)
+        match_dict["incorrectExample"] = examples(original_token, replacements)[0]
+        match_dict["correctExample"] = examples(original_token, replacements)[1]
+        match_dict["shortMessage"] = short_message(original_token, replacements)
+        match_dict["replacements"] = []
+        for replacement in replacements:
+            match_dict["replacements"].append({"value": replacement})
+        match_dict["offset"] = offset
+        match_dict["length"] = length
+        match_dict["context"] = {"text": request_string, "offset": offset, "length": length}
+        match_dict["sentence"] = request_string
+        match_dict["type"] = {"typeName": "Hint"}
+        match_dict["rule"] = {
+            "id": "DEEP_VERB__" + append_id,
+            "subId": 0,
+            "sourceFile": "not well defined",
+            "tokenizer": value["tokenizer"],
+            "description": "Deep learning rules for verb, replace, comma, etc.",
+            "issueType": "grammar",
+            "category": {"id": "SymFree_DEEP", "name": "Deep learning rules (SymFree)"},
+        }
+        match_dict["ignoreForIncompleteSentence"] = False
+        match_dict["contextForSureMatch"] = -1
+        json_output["matches"].append(match_dict)
+    return json_output
+
 
 
 def main(args):
