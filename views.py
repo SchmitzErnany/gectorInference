@@ -51,7 +51,7 @@ model = GecBERTModel(
 
 #%%
 
-request_string = "Mas seguem os relatórios."
+request_string = "Eles e aqui."
 repl = predict_for_paragraph(
     request_string,
     model,
